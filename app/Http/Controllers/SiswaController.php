@@ -2,7 +2,6 @@
 namespace App\Http\Controllers;
 use App\Models\Siswa;
 use App\Models\User;
-use Illuminate\Http\Response;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
@@ -30,38 +29,34 @@ class SiswaController extends Controller
         return view('admin.siswa.create');
     }
      public function store(Request $request):RedirectResponse{
-        //validasi
         $validate = $request->validate([
             'name' => 'required|string|max:250',
-            'email' => 'required|email|max:250|unique:users',
-            'password' => 'required|min:8|confirmed',
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'nis' => 'required|numeric',
-            'tingkatan' => 'required',
-            'jurusan' => 'required',
             'kelas' => 'required',
             'hp' => 'required|numeric',
+            'status' => 'required|in:0,1',
         ]);
-        $image = $request->file('image');
-        $image->storeAs('public/siswas', $image->hashName(), 'public');
-        $id_akun = $this->insertAccount($request->name, $request->email, $request->password);
+
+        $id_akun = $this->insertAccount($request->name, $request->nis);
+
         Siswa::create([
             'id_user' => $id_akun,
-            'image'  => $image->hashName(),
+            'image'  => 'default-avatar.svg',
             'nis' => $request->nis,
-            'tingkatan' => $request->tingkatan,
-            'jurusan' => $request->jurusan,
             'kelas' => $request->kelas,
             'hp' => $request->hp,
-            'status' => 1
+            'tingkatan' => '-',
+            'jurusan' => '-',
+            'status' => $request->status
         ]);
         return redirect()->route('siswa.index')->with(['success' =>'Data Berhasil Disimpan!']);
      }
-     public function insertAccount(string $name, string $email, string $password){
+     public function insertAccount(string $name, string $nis){
+        $email = 'siswa' . $nis . '@epoint.local';
         User::create([
             'name' => $name,
             'email' => $email,
-            'password' => Hash::make($password),
+            'password' => Hash::make($nis),
             'usertype' => 'siswa'
         ]);
         $id = DB::table('users')->where('email',$email)->value('id');

@@ -22,13 +22,28 @@ class LoginRegisterController extends Controller
             'password'=> Hash::make($request->password),
             'usertype' => 'admin'
         ]);
+
         $credentials = $request->only('email', 'password');
-        Auth::attempt($credentials);
-        $request->session()->regenerate();
-        if ($request-> user()->usertype == 'admin'){
-            return redirect('admin/dashboard')->withSuccess('Kamu berhasil daftar dan login');
+
+        if (! Auth::attempt($credentials)) {
+            return redirect()->route('login')->withErrors([
+                'email' => 'Akun berhasil dibuat, silakan login ulang.',
+            ]);
         }
-        return redirect()->intended(route('dashboard'));
+
+        $request->session()->regenerate();
+
+        if ($request->user()->usertype == 'admin') {
+            return redirect()->route('siswa.index')->withSuccess('Kamu berhasil daftar dan login');
+        }
+
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->withErrors([
+            'email' => 'Akun ini tidak punya akses admin.',
+        ]);
     }
     public function login(){
         return view('auth.login');
@@ -40,12 +55,18 @@ class LoginRegisterController extends Controller
         ]);
         if(Auth::attempt($credentials)){
             $request->session()->regenerate();
+
             if($request->user()->usertype=='admin'){
-                return redirect('admin/dashboard')->withSuccess('with successfully logged in!!');
+                return redirect()->route('siswa.index')->withSuccess('Kamu berhasil login');
             }
+
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
         }
+
         return back()->withErrors([
-            'email'=> 'your provided credentials do not macth in your records',
+            'email'=> 'Email atau password tidak sesuai.',
         ])->onlyInput('email');
     }
     public function logout(Request $request){

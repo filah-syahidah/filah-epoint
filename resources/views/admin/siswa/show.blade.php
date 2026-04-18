@@ -1,69 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>latihan laravel 11</title>
-    <style type="text/css">
-        table {
-            border-collapse: collapse;
-            margin: 20px 0px;
-            text-align: left;
-        }
+@extends('admin.layouts')
 
-        table,
-        th,
-        td {
-            border: 1px solid;
-            text-align: left;
-            padding-right: 20px;
-        }
-    </style>
-</head>
-<body>
-<h1>Detail Siswa</h1>
-    <a href="{{ route('siswa.index') }}">Kembali</a>
+@section('title', 'Detail Siswa')
+@section('page_title', 'Detail Siswa')
 
+@section('content')
+<div class="panel-card">
+    <div class="panel-detail-grid">
+        <div class="panel-detail-photo">
+            <img src="{{ asset('storage/siswas/' . $siswa->image) }}" alt="Foto {{ $siswa->name }}" class="panel-avatar panel-avatar-xl">
+        </div>
 
-    <table>
-        <tr>
-            <td colspan="4" style="text-align: center;"> <img src="{{ asset('storage/public/siswas/' . $siswa->image) }}" width="120px" height="120px"></td>
-        </tr>
-        <tr>
-            <th colspan="2">Akun Siswa</th>
-            <th colspan="2">Data Siswa</th>
-        </tr>
-        <tr>
-            <th>Nama</th>
-            <td>: {{ $siswa->name }}</td>
-            <th>Nis</th>
-            <td>: {{ $siswa->nis }}</td>
-        </tr>
-        <tr>
-            <th>Email</th>
-            <td>{{ $siswa->email }} </td>
-            <th>Kelas</th>
-            <td> {{ $siswa->tingkatan }} {{ $siswa->jurusan }} {{ $siswa->kelas}} </td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <th>No Hp</th>
-            <td> {{ $siswa->hp}} </td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <th>Status</th>
-            @if($siswa->status == 1):
-            <td>: Aktif</td>
-            @else
-            <td>: Tidak Aktif</td>
-            @endif
-        </tr>
-    </table>
+        <div class="panel-detail-section">
+            <h3>Akun Siswa</h3>
+            <dl>
+                <dt>Nama</dt>
+                <dd>{{ $siswa->name }}</dd>
 
+                <dt>Email</dt>
+                <dd>{{ $siswa->email }}</dd>
+            </dl>
+        </div>
 
-</body>
+        <div class="panel-detail-section">
+            <h3>Data Siswa</h3>
+            <dl>
+                <dt>NIS</dt>
+                <dd>{{ $siswa->nis }}</dd>
 
-</html>
+                <dt>Kelas</dt>
+                <dd>{{ $siswa->tingkatan }} {{ $siswa->jurusan }} {{ $siswa->kelas }}</dd>
+
+                <dt>No HP</dt>
+                <dd>{{ $siswa->hp }}</dd>
+
+                <dt>Status</dt>
+                <dd>
+                    <span class="panel-status {{ $siswa->status == 1 ? 'is-active' : 'is-inactive' }}">
+                        {{ $siswa->status == 1 ? 'Aktif' : 'Tidak Aktif' }}
+                    </span>
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="panel-cta-row" style="margin-top: 28px;">
+        <a href="{{ route('siswa.edit', $siswa->id) }}" class="panel-btn">Edit Data</a>
+        <a href="{{ route('siswa.index') }}" class="panel-btn panel-btn-outline">Kembali</a>
+    </div>
+</div>
+@endsection
